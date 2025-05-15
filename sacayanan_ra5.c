@@ -389,6 +389,7 @@ void* master_thread(void *arg) {
     printf("Sent num_cols to slave %d\n", d->thread_id);
 
     // send matrix to slave (number by number)
+    printf("Sending matrix to slave %d...\n", d->thread_id);
     for (int i=0; i<d->num_rows; i++) {
         for (int j=0; j<d->num_cols; j++) {
             if (send(socket_desc, &d->matrix[d->row_start + i][j], sizeof(double), 0) < 0) {
