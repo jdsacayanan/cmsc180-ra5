@@ -490,7 +490,7 @@ int master_client(int n) {
         char *slaveIP = strtok(line, ":");
         char *slavePort = strtok(NULL, ":");
         int port = atoi(slavePort); // convert port to integer
-        d[i].ipAddress = slaveIP;
+        d[i].ipAddress = strdup(slaveIP);
         d[i].port = port;
     }
     fclose(fp);
