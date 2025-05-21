@@ -123,10 +123,6 @@ void* slave_thread(void *arg) {
     // get thread arguments
     struct threadArguments *d = (struct threadArguments*)arg;
 
-    // pin this thread to a specific CPU core
-    set_thread_affinity(d->thread_id % get_cpu_count());
-    printf("Thread %d pinned to core %d\n", d->thread_id, d->thread_id % get_cpu_count());
-
     int socket_desc, client_sock, client_size;
     struct sockaddr_in server_addr, client_addr;
 
@@ -172,6 +168,10 @@ void* slave_thread(void *arg) {
         pthread_exit(NULL);
     }
     printf("Received thread id: %d\n", d->thread_id);
+
+    // pin this thread to a specific CPU core
+    set_thread_affinity(d->thread_id % get_cpu_count());
+    printf("Thread %d pinned to core %d\n", d->thread_id, d->thread_id % get_cpu_count());
 
     // receive num_rows from master
     if (recv(client_sock, &d->num_rows, sizeof(d->num_rows), 0) < 0) {
