@@ -1,0 +1,42 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{#1}
+\csname url@rmstyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand\BIBentrySTDinterwordspacing{\spaceskip=0pt\relax}
+\providecommand\BIBentryALTinterwordstretchfactor{4}
+\providecommand\BIBentryALTinterwordspacing{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus \fontdimen4\font\relax}
+\providecommand\BIBforeignlanguage[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+
+\bibitem{waldo1996note}
+J.~Waldo, G.~Wyant, A.~Wollrath, and S.~Kendall, ``A note on distributed computing,'' in \emph{International Workshop on Mobile Object Systems}.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 1996, pp. 49--64.
+
+\bibitem{socketc}
+\BIBentryALTinterwordspacing
+GeeksforGeeks. (2025, Apr.) Socket programming in c. [Online]. Available: \url{https://www.geeksforgeeks.org/socket-programming-cc/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{lewis1996pthreads}
+B.~Lewis and D.~J. Berg, ``Pthreads primer,'' \emph{Sun Microsystems Inc}, 1996.
+
+\bibitem{love2003kernel}
+R.~Love, ``Kernel korner: Cpu affinity,'' \emph{Linux Journal}, vol. 2003, no. 111, p.~8, 2003.
+
+\bibitem{newhehe}
+\BIBentryALTinterwordspacing
+{Tennessee Tech University}. (2025, Feb.) Cache awareness. [Online]. Available: \url{https://tinyurl.com/2aj2x8tz}
+\BIBentrySTDinterwordspacing
+
+\bibitem{jacob2010memory}
+B.~Jacob, D.~Wang, and S.~Ng, \emph{Memory systems: cache, DRAM, disk}.\hskip 1em plus 0.5em minus 0.4em\relax Morgan Kaufmann, 2010.
+
+\end{thebibliography}
