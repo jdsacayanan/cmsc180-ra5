@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.1)  6 MAY 2025 11:36
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.1)  23 MAY 2025 03:07
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/jadon/Desktop/cmsc180-ra4/latex/cs190-ieee.tex
-(/Users/jadon/Desktop/cmsc180-ra4/latex/cs190-ieee.tex
+**/Users/jadon/Desktop/cmsc180-ra5/latex/cs190-ieee.tex
+(/Users/jadon/Desktop/cmsc180-ra5/latex/cs190-ieee.tex
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
 (./IEEE/IEEEtran.cls
@@ -153,11 +153,13 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 29.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 29.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 49.
 
 
 
 
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 106.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 89.
 (/Users/jadon/Library/TinyTeX/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ) [1{/Users/jadon/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/jadon/Library/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc}
@@ -166,68 +168,73 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ]
 
 
-LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 174.
-
-
 
 [2]
-<images/multi_chart.png, id=13, 602.25pt x 372.39125pt>
-File: images/multi_chart.png Graphic file (type png)
-<use images/multi_chart.png>
-Package pdftex.def Info: images/multi_chart.png  used on input line 200.
-(pdftex.def)             Requested size: 232.19843pt x 143.57846pt.
+
+
+LaTeX Warning: Reference `multi_chart' on page 3 undefined on input line 177.
 
 
 LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 211.
+               Default added (so using `tbp') on input line 179.
 
-<images/nca_chart.png, id=15, 602.25pt x 372.39125pt>
-File: images/nca_chart.png Graphic file (type png)
-<use images/nca_chart.png>
-Package pdftex.def Info: images/nca_chart.png  used on input line 237.
-(pdftex.def)             Requested size: 232.19843pt x 143.57846pt.
+<images/plot_master.png, id=16, 722.7pt x 542.025pt>
+File: images/plot_master.png Graphic file (type png)
+<use images/plot_master.png>
+Package pdftex.def Info: images/plot_master.png  used on input line 205.
+(pdftex.def)             Requested size: 232.19843pt x 174.14627pt.
+
+
+[3 <./images/plot_master.png>]
+
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `tbp') on input line 221.
+
+<images/plot_slave.png, id=20, 722.7pt x 542.025pt>
+File: images/plot_slave.png Graphic file (type png)
+<use images/plot_slave.png>
+Package pdftex.def Info: images/plot_slave.png  used on input line 247.
+(pdftex.def)             Requested size: 232.19843pt x 174.14627pt.
 
 
 
 LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 248.
+               Default added (so using `tbp') on input line 262.
 
 
-Overfull \hbox (4.00009pt too wide) in paragraph at lines 251--269
+Overfull \hbox (34.0001pt too wide) in paragraph at lines 265--283
  [][] 
  []
 
-<images/ca_chart.png, id=16, 602.25pt x 372.39125pt>
-File: images/ca_chart.png Graphic file (type png)
-<use images/ca_chart.png>
-Package pdftex.def Info: images/ca_chart.png  used on input line 274.
-(pdftex.def)             Requested size: 232.19843pt x 143.57846pt.
 
 
-[3 <./images/multi_chart.png> <./images/nca_chart.png>] (./cs190-ieee.bbl
+[4 <./images/plot_slave.png>] (./cs190-ieee.bbl
 
 )
 
-[4 <./images/ca_chart.png>] (./cs190-ieee.aux)
+[5] (./cs190-ieee.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
+
+
+LaTeX Warning: There were undefined references.
+
  ) 
 Here is how much of TeX's memory you used:
- 1842 strings out of 475172
- 33144 string characters out of 5765190
- 460973 words of memory out of 5000000
- 24853 multiletter control sequences out of 15000+600000
- 596207 words of font info for 98 fonts, out of 8000000 for 9000
+ 1832 strings out of 475172
+ 32828 string characters out of 5765190
+ 456008 words of memory out of 5000000
+ 24841 multiletter control sequences out of 15000+600000
+ 598940 words of font info for 101 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 57i,16n,65p,704b,365s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on cs190-ieee.pdf (4 pages, 98974 bytes).
+ 57i,16n,65p,830b,363s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on cs190-ieee.pdf (5 pages, 459628 bytes).
 PDF statistics:
- 45 PDF objects out of 1000 (max. 8388607)
- 24 compressed objects within 1 object stream
+ 58 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

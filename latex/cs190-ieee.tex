@@ -2,7 +2,7 @@
 \usepackage{cite,graphicx}
 \usepackage{multirow}
 
-\newcommand{\SPTITLE}{Distributing Parts of a Matrix from Master to Slaves Over Sockets with Multi-threading and CPU Affinity}
+\newcommand{\SPTITLE}{Master-Slave Distributed Z-Score Normalization of a Square Matrix using Socket Communication with Multi-threading and CPU Affinity}
 \newcommand{\ADVISEE}{Jadon C. Sacayanan}
 % \newcommand{\ADVISER}{Adviser M. Name}
 
@@ -30,7 +30,7 @@
 
 % ABSTRACT
 \begin{abstract}
-    This research examines the performance of a multi-threaded master-slave architecture for distributing parts of a matrix using sockets, both within a single PC and across multiple PCs. The study compares scenarios with and without CPU affinity. The focus is on the average runtime as the number of slaves increases. Results indicate that increasing the number of slaves reduces runtime significantly, with distributed computing across multiple machines showing the best performance. 
+    This research examines the performance of a multi-threaded master-slave architecture for computing the Z-score normalization of a square matrix. The program utilizes socket communication to distribute submatrices to multiple slave processes, allowing for parallel processing. The study investigates the impact of varying the number of slave processes on the runtime of the Z-score normalization computation. The results demonstrate that increasing the number of slaves significantly reduces runtime, highlighting the benefits of distributed computing for large-scale matrix computations.
 \end{abstract}
 
 % INDEX TERMS
@@ -42,22 +42,22 @@ parallel computing, multi-threading, CPU affinity, Z-score normalization, matrix
 \section{Introduction}
 Efficient data processing is crucial in high-performance computing, where optimizing computational tasks can significantly improve execution speed. When managing large datasets, data can be distributed to enable parallel processing, which may reduce processing time and improve overall performance.
 
-% \subsection{Z-score normalization}
-% The Z-score indicates how far a value deviates from the mean, measured in standard deviations, ensuring that all measurements are on the same scale\cite{andrade2021z}.
-% All distributions expressed in Z-scores have the same mean (0) and the same variance (1). This allows Z-scores to be used in comparing observations coming from different distributions \cite{abdi2007z}.
-% To compute for the Z-score, we use the formula:
-% \begin{equation}
-% \label{zscoreformula}
-%     z=\frac{x-\mu}{\sigma}
-% \end{equation}
-% where:
-% \( x \) is the observed value,  
-% \( \mu \) is the mean, and
-% \( c \) is the standard deviation.
+\subsection{Z-score normalization}
+The Z-score indicates how far a value deviates from the mean, measured in standard deviations, ensuring that all measurements are on the same scale\cite{andrade2021z}.
+All distributions expressed in Z-scores have the same mean (0) and the same variance (1). This allows Z-scores to be used in comparing observations coming from different distributions \cite{abdi2007z}.
+To compute for the Z-score, we use the formula:
+\begin{equation}
+\label{zscoreformula}
+    z=\frac{x-\mu}{\sigma}
+\end{equation}
+where:
+\( x \) is the observed value,  
+\( \mu \) is the mean, and
+\( c \) is the standard deviation.
 
-% In columnar Z-score normalization, each column in a matrix is normalized independently by applying the Z-score formula to every value.
-% For each column, the mean and standard deviation are computed separately, and each value is transformed by subtracting the column's mean and dividing by its standard deviation.
-% Since Z-scores standardize measurements to the same scale by effectively removing units, they allow for the comparison of values that were originally measured in different units \cite{abdi2007z}.
+In columnar Z-score normalization, each column in a matrix is normalized independently by applying the Z-score formula to every value.
+For each column, the mean and standard deviation are computed separately, and each value is transformed by subtracting the column's mean and dividing by its standard deviation.
+Since Z-scores standardize measurements to the same scale by effectively removing units, they allow for the comparison of values that were originally measured in different units \cite{abdi2007z}.
 
 \subsection{Distributed computing}
 Distributed computing refers to programs that make calls to other address spaces, which may reside on the same machine or potentially on remote machines. This includes technologies such as remote object invocation, where tasks are distributed across different systems, allowing for the execution of processes on separate nodes and facilitating efficient resource utilization in a networked environment
@@ -91,18 +91,14 @@ This reduces the frequency of cache misses and enhances overall processing effic
 Programs has the tendency to repeatedly use the same data items during their execution. This principle is the basis for caching and suggests that it is beneficial to store frequently accessed instructions or data items nearby for future use \cite{jacob2010memory}.
 
 
-% TODO : cite https://www.csc.tntech.edu/pdcincs/resources/modules/plugged/false_sharing/Cache%20Awareness-Cpp.pdf
-
-
 % OBJECTIVES
 \section{Objectives}
     This research activity aims to analyze the performance and efficiency of distributing matrix computations across multiple processes using socket communication.
     Specifically, it aims to:
 \begin{enumerate}
     \item Implement a master-slave architecture that distributes submatrices to multiple processes via socket communication.
-    \item Investigate the impact of varying the number of slave processes (t) on the execution time of matrix distribution tasks.
-    \item Compare the performance when all processes are run on a single machine versus when processes are distributed across multiple physical machines.
-    \item Evaluate the effect of core-affinity on communication efficiency when processes execute on the same physical machine.
+    \item Solve the Z-score normalization problem using the master-slave architecture.
+    \item Investigate the impact of varying the number of slave processes (t) on solving the Z-score normalization problem.
 \end{enumerate}
 
 
@@ -119,10 +115,22 @@ The program is written in C and begins by prompting the user to input three valu
 \subsection{Master}
 When the program is run as a master, it generates an n × n random square matrix. The matrix is then divided into submatrices, each with n columns and approximately n/t rows, where t is the number of slaves. If n is not exactly divisible by t, the remaining rows are distributed among the first few slaves, with each receiving at most one additional row. Rather than creating separate matrices, the master identifies the start and end row indices for each submatrix, referencing the original matrix directly.
 
-Once all submatrices are determined, the master establishes socket connections to the slave machines. It then sends each submatrix, number by number, to its assigned slave. After transmission, the master waits for an acknowledgment from each slave to confirm that the submatrix was received successfully.
+Once all submatrices are determined, the master establishes socket connections to the slave machines. It then sends each submatrix, number by number, to its assigned slave. After transmission, the master waits for the computed Z-scores from the slaves. Each slave sends back the computed Z-scores, which are then stored in a dynamically allocated array. The master waits for all slaves to finish before closing the socket connections.
+
+Each connection to a slave is handled by a separate thread, allowing the master to manage multiple connections concurrently. This allows the master to send submatrices to multiple slaves simultaneously. At the same time, the each thread only waits for a particular slave to finish computation while other threads continue to send submatrices to other slaves. This design improves the overall efficiency of the program by reducing idle time during communication. This would also mean that the only idle time of the master is when it is waiting for the last slave to finish computation.
+
+Excess computations are avoided by using the same array for both sending and receiving data. This means that no temporary matrices are created, and the original matrix is modified in place. 
+
+The master also measures the time taken for the entire process, from establishing connections to receiving the final Z-scores. This time measurement is done using the sys/time.h header, capturing timestamps before and after the socket communication.
 
 \subsection{Slave}
-When the program is run as a slave, it waits for a connection from the master. Upon connection, the slave receives the submatrix data, transmitted number by number, and stores it in a dynamically allocated array sized according to the expected number of rows and columns. After successfully receiving the entire submatrix, the slave sends an acknowledgment back to the master to confirm receipt. Once the communication is complete, the socket connection is closed.
+When the program is run as a slave, it waits for a connection from the master. Upon connection, the slave receives the submatrix data, transmitted number by number, and stores it in a dynamically allocated array sized according to the expected number of rows and columns. After successfully receiving the entire submatrix, the slave computes the Z-scores for each element in the submatrix using the formula provided in Equation \ref{zscoreformula}. The computed Z-scores are then sent back to the master, and the socket connection is closed.
+
+The slave also measures the time taken for the computation process only and does not include the socket communication time. This is done by capturing timestamps before and after the computation phase, allowing for a clear understanding of the time spent on the actual Z-score calculations.
+
+The computation of the Z-score normalization is done in a parallel. The submatrix is divided into t parts, and each part is assigned to a separate thread. Each thread computes the Z-scores for its assigned part of the submatrix independently, allowing for concurrent processing and improved performance.
+
+Just like the master, the slave uses the same array for both sending and receiving data. This means that no temporary matrices are created, and the original matrix is modified in place.
 
 \subsection{Threading}
 The program uses the pthread library to create threads. In both the master and slave roles, each thread is responsible for handling a single socket connection, starting from establishing the connection (sending or listening) until the communication is closed. This design allows concurrent handling of multiple connections, enabling parallel distribution and reception of submatrices.
@@ -130,16 +138,16 @@ The program uses the pthread library to create threads. In both the master and s
 \subsection{CPU affinity}
 The program determines the number of available cores using the sysconf function and assigns each thread to a specific core using the CPU affinity feature. To ensure system stability and prevent resource contention, one core is reserved for main system processes, such as the operating system scheduler, background services, and essential system tasks. Each thread is pinned to a dedicated CPU core using the CPU set function, preventing the operating system from migrating threads between cores and reducing interference from other system functions. This avoids the overhead of thread migration and maximizes program performance.
 
-% \subsection{Computing for the columnar Z-score normalization}
-% To compute the z-score normalization of a two-dimensional matrix, a loop traverses across the columns of the matrix.
+\subsection{Computing for the columnar Z-score normalization}
+To compute the z-score normalization of a two-dimensional matrix, a loop traverses across the columns of the matrix.
 
-% In each column, a loop computes the mean by taking the sum of all elements in the column and dividing the result by the height of the column.
-% The standard deviation is also computed using a loop by taking the square root of the sum of the squared differences between each element and the mean, divided by the height of the column.
+In each column, a loop computes the mean by taking the sum of all elements in the column and dividing the result by the height of the column.
+The standard deviation is also computed using a loop by taking the square root of the sum of the squared differences between each element and the mean, divided by the height of the column.
 
-% Finally, the z-score for each element is calculated using Formula \ref{zscoreformula} and directly stored in the same array.
-% No temporary matrices are created since the original matrix is modified in place with the help of pointers.
+Finally, the z-score for each element is calculated using Formula \ref{zscoreformula} and directly stored in the same array.
+No temporary matrices are created since the original matrix is modified in place with the help of pointers.
 
-% These computations are done by each individual thread on the submatrix assigned to it.
+These computations are done by each individual thread on the submatrix assigned to it.
 
 
 \subsection{Time measurement}
@@ -149,147 +157,163 @@ The program uses the sys/time.h header to measure execution time by capturing a 
 \subsection{Distributed computing}
 The program utilizes four machines, running up to four instances of the slave program on each machine. Different configurations were used depending on the value of n. For n=2, two machines were used, each running one instance of the slave. For n=4, four machines were used with one instance of the slave on each. For n=8, the same four machines were used, each running two instances of the slave. Finally, for n=16, all four machines ran four instances of the slave each.
 
-It also utilized a personlaized one-to-many broadcast mechanism, where the master node efficiently sends data to multiple slave nodes simultaneously. This approach minimizes communication overhead by leveraging non-blocking socket operations, ensuring that the master can continue transmitting data to other nodes without waiting for acknowledgments from previously contacted nodes.
-
-
-
-% \subsection{Program Setup}
-% By default, the program accesses the matrix in a column-major order. An additional setup was implemented to process the matrix in a row-major order.
+It also utilized a personalized one-to-many broadcast mechanism, where the master node efficiently sends data to multiple slave nodes simultaneously. This approach minimizes communication overhead by leveraging non-blocking socket operations, ensuring that the master can continue transmitting data to other nodes without waiting for acknowledgments from previously contacted nodes.
 
 
 \subsection{System information}
-The program was executed on an Acer desktop equipped with an Intel® Core™ i7-8700 processor (3.20 GHz) and 16GB of memory, running Ubuntu 22.04.5 LTS. Both the master and all slave machines used the same hardware and software configuration.
+The program was executed on an Acer desktop equipped with an Intel® Core™ i5-13400 processor and 16GB of memory, running Ubuntu 22.04.5 LTS. Both the master and all slave machines used the same hardware and software configuration.
 
 % RESULTS AND DISCUSSION
 \section{Results and Discussion}
-The program was executed independently for three iterations for each setup, recording the runtime or elapsed time for each execution.
+The program was executed independently for three iterations where each iteration was run with different values of n and t. The average runtime was calculated for each configuration, and the results were recorded.
 
 % Please add the following required packages to your document preamble:
 % \usepackage{multirow}
 % Please add the following required packages to your document preamble:
 % \usepackage{multirow}
 
-\subsection{Distributed computing with slaves running on different machines}
+\subsection{Runtime results of the master process}
+
+The master process measures the time elapsed from the start of the socket communication until the last Z-score is received. The results are shown in Table \ref{master} and Figure \ref{multi_chart}. The average runtime is calculated by taking the mean of the three runs for each configuration.
 
 \begin{table}[]
 \begin{center}
-    \caption{Runtime Executions for Different n and t values in seconds for Distributed Computing on Different Machines}
+    \caption{Time elapsed as reported by the master process.}
     \begin{tabular}{|c|c|ccc|c|}
-    \hline
-    \multirow{2}{*}{\textbf{n}} & \multirow{2}{*}{\textbf{t}} & \multicolumn{3}{c|}{\textbf{Time Elapsed (seconds)}} & \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Average\\ Runtime\end{tabular}}} \\ \cline{3-5}
-     &  & \multicolumn{1}{c|}{\textbf{Run 1}} & \multicolumn{1}{c|}{\textbf{Run 2}} & \textbf{Run 3} &  \\ \hline
-    20000 & 2 & \multicolumn{1}{c|}{158.073970} & \multicolumn{1}{c|}{161.382508} & 154.220397 & 157.892292 \\ \hline
-    20000 & 4 & \multicolumn{1}{c|}{92.240668} & \multicolumn{1}{c|}{88.906241} & 94.108334 & 91.751748 \\ \hline
-    20000 & 8 & \multicolumn{1}{c|}{66.350505} & \multicolumn{1}{c|}{68.771319} & 64.112398 & 66.411407 \\ \hline
-    20000 & 16 & \multicolumn{1}{c|}{49.856434} & \multicolumn{1}{c|}{50.602118} & 47.981374 & 49.479975 \\ \hline
-    25000 & 2 & \multicolumn{1}{c|}{258.821180} & \multicolumn{1}{c|}{267.093215} & 252.543018 & 259.485804 \\ \hline
-    25000 & 4 & \multicolumn{1}{c|}{143.290254} & \multicolumn{1}{c|}{140.113850} & 146.001709 & 143.135271 \\ \hline
-    25000 & 8 & \multicolumn{1}{c|}{110.955387} & \multicolumn{1}{c|}{108.144267} & 113.589460 & 110.896371 \\ \hline
-    25000 & 16 & \multicolumn{1}{c|}{72.869340} & \multicolumn{1}{c|}{74.302138} & 70.004250 & 72.391909 \\ \hline
-    30000 & 2 & \multicolumn{1}{c|}{371.310715} & \multicolumn{1}{c|}{377.498020} & 365.918605 & 371.575780 \\ \hline
-    30000 & 4 & \multicolumn{1}{c|}{179.321567} & \multicolumn{1}{c|}{183.927205} & 175.203491 & 179.484088 \\ \hline
-    30000 & 8 & \multicolumn{1}{c|}{161.082212} & \multicolumn{1}{c|}{164.189404} & 158.440373 & 161.237330 \\ \hline
-    30000 & 16 & \multicolumn{1}{c|}{138.598874} & \multicolumn{1}{c|}{136.221670} & 141.785209 & 138.868584 \\ \hline
+\hline
+\multirow{2}{*}{\textbf{n}} & \multirow{2}{*}{\textbf{t}} & \multicolumn{3}{c|}{\textbf{Time Elapsed (seconds)}} & \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Average\\ Runtime\end{tabular}}} \\ \cline{3-5}
+ &  & \multicolumn{1}{c|}{\textbf{Run 1}} & \multicolumn{1}{c|}{\textbf{Run 2}} & \textbf{Run 3} &  \\ \hline
+20000 & 2 & \multicolumn{1}{c|}{78.598209} & \multicolumn{1}{c|}{78.493001} & 78.527834 & 78.539681 \\ \hline
+20000 & 4 & \multicolumn{1}{c|}{64.100006} & \multicolumn{1}{c|}{64.215567} & 64.178477 & 64.164683 \\ \hline
+20000 & 8 & \multicolumn{1}{c|}{55.113805} & \multicolumn{1}{c|}{55.858100} & 55.167691 & 55.379865 \\ \hline
+20000 & 16 & \multicolumn{1}{c|}{55.203650} & \multicolumn{1}{c|}{55.435277} & 55.194854 & 55.277927 \\ \hline
+25000 & 2 & \multicolumn{1}{c|}{122.330935} & \multicolumn{1}{c|}{122.325718} & 122.334482 & 122.330378 \\ \hline
+25000 & 4 & \multicolumn{1}{c|}{100.327608} & \multicolumn{1}{c|}{100.423944} & 100.273722 & 100.341758 \\ \hline
+25000 & 8 & \multicolumn{1}{c|}{86.651681} & \multicolumn{1}{c|}{86.035480} & 86.535978 & 86.407713 \\ \hline
+25000 & 16 & \multicolumn{1}{c|}{85.911332} & \multicolumn{1}{c|}{85.554153} & 86.145068 & 85.870184 \\ \hline
+30000 & 2 & \multicolumn{1}{c|}{178.102334} & \multicolumn{1}{c|}{178.096227} & 178.109482 & 178.102681 \\ \hline
+30000 & 4 & \multicolumn{1}{c|}{144.105122} & \multicolumn{1}{c|}{144.169503} & 144.517692 & 144.264106 \\ \hline
+30000 & 8 & \multicolumn{1}{c|}{124.863588} & \multicolumn{1}{c|}{124.026440} & 124.240050 & 124.376693 \\ \hline
+30000 & 16 & \multicolumn{1}{c|}{124.139228} & \multicolumn{1}{c|}{124.010230} & 123.914170 & 124.021209 \\ \hline
     \end{tabular}
-    \label{multi}
+    \label{master}
 \end{center}
 \end{table}
 
 \begin{figure}
     \centering
-    \fbox{\includegraphics[width=0.45\textwidth]{images/multi_chart}}
-    \caption{Runtime Executions for n=20000 in seconds for Distributed Computing on Different Slaves using Different Machines}
-    \label{multi_chart}
+    \fbox{\includegraphics[width=0.45\textwidth]{images/plot_master.png}}
+    \caption{Runtime Trends over Data Size and Threads for the Master Process}
+    \label{plot_master}
 \end{figure}
 
-Table \ref{multi} shows the average runtime for distributing an n x n matrix using t threads across different slaves running on different machines. The results indicate that as the number of slaves increases, the runtime decreases significantly.
+Table \ref{master} shows that lower the fastest average runtime is achieved at n=20000 and t=16, with an average runtime of 55.277927 seconds. The slowest average runtime is at n=30000 and t=2, with an average runtime of 178.102681 seconds.
 
-For a square matrix of size 20,000, the slowest runtime of approximately 157.89 seconds is observed when using 2 slaves. In contrast, the fastest runtime of approximately 49.48 seconds is achieved when using 16 slaves. This trend is visualized in Figure \ref{multi_chart}, where the runtime consistently decreases as the number of slaves increases.
+As visualized in Figure \ref{plot_master}, the average runtime decreases as the number of slaves increases, indicating that distributing the workload across multiple slaves improves performance. The trend is consistent across different matrix sizes, with larger matrices shows more pronounced improvements in runtime as the number of slaves increases. 
 
-\subsection{Distributed computing with slaves running on a single machine without core affinity}
+Figure \ref{plot_master} also shows that the average runtime increases as the matrix size increases. This is expected, as larger matrices require more computations and data transfer, leading to longer processing times.
+
+Overall, the results indicate that the average runtime decreases at lower matrix sizes with an increased number of slaves.
+
+\subsection{Runtime results of the slave process}
+The slave process measures the time elapsed for the computation of the Z-scores only. The maximum computation time accross the different slaves is recorded. The results are shown in Table \ref{slave} and Figure \ref{plot_slave}. The average runtime is calculated by taking the mean of the three runs for each configuration.
 
 \begin{table}[]
 \begin{center}
-    \caption{Runtime Executions for Different n and t values in seconds for Distributed Computing on Different Slaves using a Single Machine without Core Affinity}
+    \caption{Time elapsed as reported by the slave processes.}
     \begin{tabular}{|c|c|ccc|c|}
-    \hline
-    \multirow{2}{*}{\textbf{n}} & \multirow{2}{*}{\textbf{t}} & \multicolumn{3}{c|}{\textbf{Time Elapsed (seconds)}} & \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Average\\ Runtime\end{tabular}}} \\ \cline{3-5}
-     &  & \multicolumn{1}{c|}{\textbf{Run 1}} & \multicolumn{1}{c|}{\textbf{Run 2}} & \textbf{Run 3} &  \\ \hline
-    20000 & 2 & \multicolumn{1}{c|}{164.150009} & \multicolumn{1}{c|}{166.822194} & 160.485729 & 163.819311 \\ \hline
-    20000 & 4 & \multicolumn{1}{c|}{106.496193} & \multicolumn{1}{c|}{109.841512} & 104.219304 & 106.852336 \\ \hline
-    20000 & 8 & \multicolumn{1}{c|}{111.433945} & \multicolumn{1}{c|}{108.756837} & 113.275409 & 111.155397 \\ \hline
-    20000 & 16 & \multicolumn{1}{c|}{209.123130} & \multicolumn{1}{c|}{202.578341} & 211.892084 & 207.864518 \\ \hline
-    25000 & 2 & \multicolumn{1}{c|}{257.352387} & \multicolumn{1}{c|}{263.091982} & 254.305673 & 258.250014 \\ \hline
-    25000 & 4 & \multicolumn{1}{c|}{174.123655} & \multicolumn{1}{c|}{176.452399} & 171.009812 & 173.861955 \\ \hline
-    25000 & 8 & \multicolumn{1}{c|}{169.091237} & \multicolumn{1}{c|}{173.208420} & 165.877304 & 169.392320 \\ \hline
-    25000 & 16 & \multicolumn{1}{c|}{344.907369} & \multicolumn{1}{c|}{337.122408} & 352.610193 & 344.879990 \\ \hline
-    30000 & 2 & \multicolumn{1}{c|}{369.370952} & \multicolumn{1}{c|}{362.041733} & 375.008091 & 368.806925 \\ \hline
-    30000 & 4 & \multicolumn{1}{c|}{254.110043} & \multicolumn{1}{c|}{260.344552} & 247.812063 & 254.088886 \\ \hline
-    30000 & 8 & \multicolumn{1}{c|}{247.671020} & \multicolumn{1}{c|}{251.493800} & 241.520991 & 246.895270 \\ \hline
-    30000 & 16 & \multicolumn{1}{c|}{512.400644} & \multicolumn{1}{c|}{523.108477} & 505.287190 & 513.598770 \\ \hline
+\hline
+\multirow{2}{*}{\textbf{n}} & \multirow{2}{*}{\textbf{t}} & \multicolumn{3}{c|}{\textbf{Max Time Elapsed (seconds)}} & \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Average\\ Runtime\end{tabular}}} \\ \cline{3-5}
+ &  & \multicolumn{1}{c|}{\textbf{Run 1}} & \multicolumn{1}{c|}{\textbf{Run 2}} & \textbf{Run 3} &  \\ \hline
+20000 & 2 & \multicolumn{1}{c|}{0.569854} & \multicolumn{1}{c|}{0.585570} & 0.576342 & 0.577255 \\ \hline
+20000 & 4 & \multicolumn{1}{c|}{0.294665} & \multicolumn{1}{c|}{0.301091} & 0.294198 & 0.296651 \\ \hline
+20000 & 8 & \multicolumn{1}{c|}{0.292461} & \multicolumn{1}{c|}{0.294098} & 0.293862 & 0.293474 \\ \hline
+20000 & 16 & \multicolumn{1}{c|}{0.290630} & \multicolumn{1}{c|}{0.292355} & 0.288578 & 0.290521 \\ \hline
+25000 & 2 & \multicolumn{1}{c|}{0.920307} & \multicolumn{1}{c|}{0.918204} & 0.922745 & 0.920419 \\ \hline
+25000 & 4 & \multicolumn{1}{c|}{0.549026} & \multicolumn{1}{c|}{0.462104} & 0.458852 & 0.489994 \\ \hline
+25000 & 8 & \multicolumn{1}{c|}{0.458849} & \multicolumn{1}{c|}{0.486524} & 0.467496 & 0.470956 \\ \hline
+25000 & 16 & \multicolumn{1}{c|}{0.438729} & \multicolumn{1}{c|}{0.450675} & 0.462885 & 0.450763 \\ \hline
+30000 & 2 & \multicolumn{1}{c|}{1.324466} & \multicolumn{1}{c|}{1.321009} & 1.328112 & 1.324529 \\ \hline
+30000 & 4 & \multicolumn{1}{c|}{0.663461} & \multicolumn{1}{c|}{0.666165} & 0.648713 & 0.659446 \\ \hline
+30000 & 8 & \multicolumn{1}{c|}{0.659471} & \multicolumn{1}{c|}{0.655963} & 0.652604 & 0.656013 \\ \hline
+30000 & 16 & \multicolumn{1}{c|}{0.641995} & \multicolumn{1}{c|}{0.659937} & 0.652261 & 0.651398 \\ \hline
     \end{tabular}
-    \label{nca}
+    \label{slave}
 \end{center}
 \end{table}
 
 \begin{figure}
     \centering
-    \fbox{\includegraphics[width=0.45\textwidth]{images/nca_chart}}
-    \caption{Runtime Executions for n=20000 in seconds for Distributed Computing on Different Slaves using a Single Machine without Core Affinity}
-    \label{nca_chart}
+    \fbox{\includegraphics[width=0.45\textwidth]{images/plot_slave.png}}
+    \caption{Runtime Trends over Data Size and Threads for the Slave Processes}
+    \label{plot_slave}
 \end{figure}
 
-Table \ref{nca} shows the average runtime for distributing an n x n matrix using t threads across different slaves running on a single machine without core affinity. The results indicate that as the number of threads increases, the runtime initially decreases but then starts to increase again after t=8.
+Table \ref{slave} shows that the fastest average runtime is achieved at n=20000 and t=16, with an average runtime of 0.290521 seconds. The slowest average runtime is at n=30000 and t=2, with an average runtime of 1.324529 seconds.
 
-For a square matrix of size 20,000, the fastest runtime of approximately 106.85 seconds is observed when using 4 threads. However, when the number of threads is increased to 16, the runtime increases significantly to approximately 207.86 seconds. This trend is visualized in Figure \ref{nca_chart}, where the runtime decreases initially but rises sharply as the number of threads exceeds the number of physical cores.
+As visualized in Figure \ref{plot_slave}, the average runtime decreases as the number of slaves increases, indicating that distributing the workload across multiple slaves improves performance. The trend is consistent across different matrix sizes, with larger matrices shows more pronounced improvements in runtime as the number of slaves increases.
 
-\subsection{Distributed computing with slaves running on a single machine with core affinity}
+Figure \ref{plot_slave} also shows that the average runtime increases as the matrix size increases. This is expected, as larger matrices require more computations and data transfer, leading to longer processing times.
+
+Overall, the results indicate that the average runtime decreases at lower matrix sizes with an increased number of slaves.
+
+\subsection{Performance metrics}
 
 \begin{table}[]
 \begin{center}
-    \caption{Runtime Executions for Different n and t values in seconds for Distributed Computing on Different Slaves using a Single Machine with Core Affinity}
-    \begin{tabular}{|c|c|ccc|c|}
-    \hline
-    \multirow{2}{*}{\textbf{n}} & \multirow{2}{*}{\textbf{t}} & \multicolumn{3}{c|}{\textbf{Time Elapsed (seconds)}} & \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Average\\ Runtime\end{tabular}}} \\ \cline{3-5}
-     &  & \multicolumn{1}{c|}{\textbf{Run 1}} & \multicolumn{1}{c|}{\textbf{Run 2}} & \textbf{Run 3} &  \\ \hline
-    20000 & 2 & \multicolumn{1}{c|}{165.097044} & \multicolumn{1}{c|}{168.201223} & 162.89451 & 165.3975923 \\ \hline
-    20000 & 4 & \multicolumn{1}{c|}{160.935094} & \multicolumn{1}{c|}{159.723} & 161.889234 & 160.8491093 \\ \hline
-    20000 & 8 & \multicolumn{1}{c|}{101.691484} & \multicolumn{1}{c|}{104.229843} & 99.875621 & 101.932316 \\ \hline
-    20000 & 16 & \multicolumn{1}{c|}{46.703392} & \multicolumn{1}{c|}{47.115298} & 45.834002 & 46.55089733 \\ \hline
-    25000 & 2 & \multicolumn{1}{c|}{268.059515} & \multicolumn{1}{c|}{270.64312} & 265.202891 & 267.9685087 \\ \hline
-    25000 & 4 & \multicolumn{1}{c|}{255.063759} & \multicolumn{1}{c|}{254.829371} & 258.140574 & 256.0112347 \\ \hline
-    25000 & 8 & \multicolumn{1}{c|}{159.475293} & \multicolumn{1}{c|}{162.008734} & 158.027191 & 159.8370727 \\ \hline
-    25000 & 16 & \multicolumn{1}{c|}{75.655035} & \multicolumn{1}{c|}{76.308295} & 74.981402 & 75.648244 \\ \hline
-    30000 & 2 & \multicolumn{1}{c|}{392.014359} & \multicolumn{1}{c|}{390.202773} & 395.451002 & 392.5560447 \\ \hline
-    30000 & 4 & \multicolumn{1}{c|}{342.224166} & \multicolumn{1}{c|}{345.11498} & 341.338267 & 342.892471 \\ \hline
-    30000 & 8 & \multicolumn{1}{c|}{232.154717} & \multicolumn{1}{c|}{229.119456} & 234.203887 & 231.82602 \\ \hline
-    30000 & 16 & \multicolumn{1}{c|}{98.284437} & \multicolumn{1}{c|}{99.087141} & 97.652309 & 98.34129567 \\ \hline
+    \caption{Performance metrics of the parallel, distributed Pearson Correlation Coefficient}
+    \begin{tabular}{|c|c|c|cccc|}
+\hline
+\multirow{2}{*}{\textbf{n}} & \multirow{2}{*}{\textbf{t}} & \multirow{2}{*}{\textbf{Serial T\textsubscript{S}}} & \multicolumn{4}{c|}{\textbf{Parallel}} \\ \cline{4-7} 
+ &  &  & \multicolumn{1}{c|}{\textbf{T\textsubscript{O}}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{E}} & \textbf{pT\textsubscript{P}} \\ \hline
+20000 & 2 & 34.114112 & \multicolumn{1}{c|}{77.385171} & \multicolumn{1}{c|}{29.548546} & \multicolumn{1}{c|}{14.774273} & 1.154511 \\ \hline
+20000 & 4 & 34.114112 & \multicolumn{1}{c|}{62.978078} & \multicolumn{1}{c|}{28.749333} & \multicolumn{1}{c|}{7.187333} & 1.186605 \\ \hline
+20000 & 8 & 34.114112 & \multicolumn{1}{c|}{53.032076} & \multicolumn{1}{c|}{14.530312} & \multicolumn{1}{c|}{1.816289} & 2.347789 \\ \hline
+20000 & 16 & 34.114112 & \multicolumn{1}{c|}{50.629591} & \multicolumn{1}{c|}{7.338994} & \multicolumn{1}{c|}{0.458687} & 4.648336 \\ \hline
+25000 & 2 & 51.692051 & \multicolumn{1}{c|}{120.489541} & \multicolumn{1}{c|}{28.080727} & \multicolumn{1}{c|}{14.040364} & 1.840837 \\ \hline
+25000 & 4 & 51.692051 & \multicolumn{1}{c|}{98.381782} & \multicolumn{1}{c|}{26.373818} & \multicolumn{1}{c|}{6.593455} & 1.959976 \\ \hline
+25000 & 8 & 51.692051 & \multicolumn{1}{c|}{82.640062} & \multicolumn{1}{c|}{13.719969} & \multicolumn{1}{c|}{1.714996} & 3.767651 \\ \hline
+25000 & 16 & 51.692051 & \multicolumn{1}{c|}{78.657976} & \multicolumn{1}{c|}{7.167299} & \multicolumn{1}{c|}{0.447956} & 7.212208 \\ \hline
+30000 & 2 & 74.122359 & \multicolumn{1}{c|}{175.453623} & \multicolumn{1}{c|}{27.980648} & \multicolumn{1}{c|}{13.990324} & 2.649058 \\ \hline
+30000 & 4 & 74.122359 & \multicolumn{1}{c|}{141.626320} & \multicolumn{1}{c|}{28.100224} & \multicolumn{1}{c|}{7.025056} & 2.637785 \\ \hline
+30000 & 8 & 74.122359 & \multicolumn{1}{c|}{119.128591} & \multicolumn{1}{c|}{14.123652} & \multicolumn{1}{c|}{1.765457} & 5.248101 \\ \hline
+30000 & 16 & 74.122359 & \multicolumn{1}{c|}{113.598847} & \multicolumn{1}{c|}{7.111858} & \multicolumn{1}{c|}{0.444491} & 10.422363 \\ \hline
     \end{tabular}
-    \label{ca}
+    \label{table3}
 \end{center}
 \end{table}
 
-\begin{figure}
-    \centering
-    \fbox{\includegraphics[width=0.45\textwidth]{images/ca_chart}}
-    \caption{Runtime Executions for n=20000 in seconds for Distributed Computing on Different Slaves using a Single Machine with Core Affinity}
-    \label{ca_chart}
-\end{figure}
+Table \ref{table3} shows the performance metrics of the parallel, distributed Z-score normalization. The serial time (T\textsubscript{S}) is the time taken to solve the Z-score normalization problem using a single thread. It is important to note that the serial time uses a single thread and accesses the memory in a column-major order. The parallel time (T\textsubscript{P}) is the maximum time taken by a single slave process to compute the Z-scores of its submatrix. The total parallel cost is taken by multiplying the number of slaves (t) by the time taken by the parallel time (T\textsubscript{P}). The speedup (S) is the ratio of the serial time to the total parallel cost, and the efficiency (E) is the ratio of the speedup to the number of slaves.
 
-Table \ref{ca} shows the average runtime for distributing an n x n matrix using t threads across different slaves running on a single machine with core affinity. The results indicate that as the number of threads increases, the runtime decreases significantly, even for higher thread counts.
+It can be observed that the parallel cost is significantly lower than the serial time, indicating that the parallel implementation is more efficient and that the parallel overhead decreases as the number of slaves increases. 
 
-For a square matrix of size 20,000, the fastest runtime of approximately 46.55 seconds is observed when using 16 threads. This trend is visualized in Figure \ref{ca_chart}, where the runtime consistently decreases as the number of threads increases.
+However, the speedup and efficiency decreases as the number of slaves increases. The efficiency is also observed to decrease as the matrix size increases, indicating that the overhead of managing the threads and communication becomes more significant as the matrix size increases.
+
+The patterns of this performance metrics are consistent with each value of n. The speedup and efficiency are highest at n=20000 and t=2, with a speedup of 29.548546 and an efficiency of 14.774273 and lowest at n=30000 and t=16, with values of 7.111858 and 0.444491, respectively.
+
+Superlinear speedup is observed until t=8 for all values of n. This is due to the fact that the program is able to take advantage of the additional computational resources, as well as the cache performance and CPU affinity. Above t=8, the speedup and efficiency decreases as the number of slaves increases. This is due to the overhead of creating and managing the threads, as well as the communication overhead between the master and slave processes.
+
+Given this data, it is important to understand that there are limits to the amount of parallelism that can be achieved. The program is able to take advantage of the additional computational resources, but there will come a point where the overhead of creating and managing the threads, as well as the communication overhead between the master and slave processes, outweighs the benefits of parallelism.
+
+
 
 
 % CONCLUSION AND FUTURE WORK
 \section{Conclusion and Future Work}
 Parallel computing enhances program performance by distributing workloads across multiple nodes, enabling efficient utilization of computational resources. The results validate that increasing the number of nodes generally reduces runtime, as observed in both distributed and single-machine setups.
 
-For distributed computing across multiple machines, increasing the number of slaves significantly improved performance, with runtimes decreasing as the number of slaves increased. This highlights the benefits of leveraging distributed systems for large-scale computations.
+For distributed computing across multiple machines, increasing the number of slaves significantly improved performance, with runtimes decreasing as the number of slaves increased. Implementing multi-threading and CPU affinity further optimized performance by ensuring that threads were efficiently scheduled on specific CPU cores.
 
-On a single machine, the use of core affinity showed mixed results. While core affinity aims to optimize cache utilization and reduce thread migration overhead, the implementation without core affinity was faster in some cases. This suggests that the system's scheduling algorithm may already optimize thread placement effectively, and the manual implementation of core affinity might introduce additional overhead. When the number of threads exceeds the number of available cores, the implementation without core affinity experiences a significant increase in runtime.
+However, the performance metrics indicate that there are limits to the amount of parallelism that can be achieved. The overhead of creating and managing threads, as well as the communication overhead between the master and slave processes, can outweigh the benefits of parallelism.
 
-In conclusion, optimizing performance in parallel computing requires an approach that considers hardware capabilities, memory access patterns, and system-level optimizations. This study provides a foundation for further exploration of efficient parallel and distributed computing techniques.
+It is important to find the balance between the number of slaves and the size of the matrix to achieve optimal performance without incurring excessive overhead. In real life scenarios, too much parallism without additional benefits can just lead to increased use of resources, thus introducing additional unecessary costs.
+
+Serial implementations may not be as bad as they theoretically sound. In some cases, the overhead of parallelism may not be worth the performance gains, especially for smaller matrices or when the number of slaves is too high. It is important to consider the specific use case and the size of the data being processed when deciding on the level of parallelism to implement.
+
+Aside from parallelism, programs can still be optimized by improving the cache performance and CPU affinity. An example of this is to use a cache-aware algorithm that takes advantage of the memory access patterns of the program. This can be done by ensuring that the data is accessed in a way that minimizes cache misses and maximizes cache hits.
+
+Future work can focus on optimizing the communication overhead between the master and slave processes, as well as exploring different parallelization strategies to further improve performance.
+
 
 % % APPENDICES
 % \appendices

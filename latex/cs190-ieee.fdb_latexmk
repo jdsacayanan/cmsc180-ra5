@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex cs190-ieee"] 1746502618.43652 "cs190-ieee.aux" "cs190-ieee.bbl" "cs190-ieee" 1746502618.68756 0
-  "./IEEE/IEEEtran.bst" 1738672941.32213 56877 4c81423924dc505d67d7e5fcc3311d54 ""
-  "./cs190-ieee.bib" 1746158177.6369 31698 3ee44fb066b9ba6f55135efe085d1c60 ""
-  "cs190-ieee.aux" 1746502618.65167 4649 e384c17bdcc77a6e4d51fed64448c302 "pdflatex"
+["bibtex cs190-ieee"] 1747926078.77379 "cs190-ieee.aux" "cs190-ieee.bbl" "cs190-ieee" 1747940822.67169 0
+  "./IEEE/IEEEtran.bst" 1747816385.37982 56877 4c81423924dc505d67d7e5fcc3311d54 ""
+  "./cs190-ieee.bib" 1747816385.38669 31698 3ee44fb066b9ba6f55135efe085d1c60 ""
+  "cs190-ieee.aux" 1747940822.62698 4329 53ca3aff9231245cc6bd49241adab8c5 "pdflatex"
   (generated)
   "cs190-ieee.bbl"
   "cs190-ieee.blg"
   (rewritten before read)
-["pdflatex"] 1746502618.47295 "/Users/jadon/Desktop/cmsc180-ra4/latex/cs190-ieee.tex" "cs190-ieee.pdf" "cs190-ieee" 1746502618.68776 0
-  "/Users/jadon/Desktop/cmsc180-ra4/latex/cs190-ieee.tex" 1746502617.89975 24214 ce0cc1f9336f48128c43f51d32d54e7b ""
+["pdflatex"] 1747940822.04501 "/Users/jadon/Desktop/cmsc180-ra5/latex/cs190-ieee.tex" "cs190-ieee.pdf" "cs190-ieee" 1747940822.67181 0
+  "/Users/jadon/Desktop/cmsc180-ra5/latex/cs190-ieee.tex" 1747940821.79931 28971 1ebd4d0ddff300a390a4639be6c724e0 ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm" 1136768653 4524 6bce29db5bc272ba5f332261583fee9c ""
@@ -26,6 +26,9 @@
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmr8.tfm" 1136768653 1292 21c1c5bfeaebccffdb478fd231a0997d ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm" 1136768653 1116 933a60c408fc0a863a92debe84b2d294 ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm" 1136768653 1120 8b7d695260f3cff42e636090a8002094 ""
+  "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
+  "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb" 1136849748 44729 811d6c62865936705a31c797a1d5dada ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb" 1136849748 44656 0cbca70e0534538582128f6b54593cca ""
   "/Users/jadon/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb" 1136849748 46026 6dab18b61c907687b520c72847215a68 ""
@@ -53,13 +56,12 @@
   "/Users/jadon/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1738379708 92935 ab22f987f93038b61e05dc32d7c07157 ""
   "/Users/jadon/Library/TinyTeX/texmf-var/web2c/pdftex/pdflatex.fmt" 1738379718 1928524 09aa6b55c9f774bc9f9715160d828601 ""
   "/Users/jadon/Library/TinyTeX/texmf.cnf" 1738425753.14171 708 85fd07691b6294ba94c59dbc62380410 ""
-  "IEEE/IEEEtran.cls" 1738672941.32324 196554 3cabd11adeac29567194b82095c92685 ""
-  "cs190-ieee.aux" 1746502618.65167 4649 e384c17bdcc77a6e4d51fed64448c302 "pdflatex"
-  "cs190-ieee.bbl" 1746502618.47166 1799 faa8adf23416657ea8171007ac034c6d "bibtex cs190-ieee"
-  "cs190-ieee.tex" 1746502617.89975 24214 ce0cc1f9336f48128c43f51d32d54e7b ""
-  "images/ca_chart.png" 1746195827.4638 16719 2de8651cbd45c90b16407b2b4fd7ea78 ""
-  "images/multi_chart.png" 1746194679.3211 15103 782fd32b9795dc75612155dab6db7202 ""
-  "images/nca_chart.png" 1746195391.34463 17563 12b8a251fe50d2eba9f50203a8685cf8 ""
+  "IEEE/IEEEtran.cls" 1747816385.38363 196554 3cabd11adeac29567194b82095c92685 ""
+  "cs190-ieee.aux" 1747940822.62698 4329 53ca3aff9231245cc6bd49241adab8c5 "pdflatex"
+  "cs190-ieee.bbl" 1747926078.79053 2113 52e6eef281f6beb71f0ea52e7ca226c2 "bibtex cs190-ieee"
+  "cs190-ieee.tex" 1747940821.79931 28971 1ebd4d0ddff300a390a4639be6c724e0 ""
+  "images/plot_master.png" 1747817887.15623 236170 49a4d3569b458cb8ca5efdd54622f697 ""
+  "images/plot_slave.png" 1747817887.17108 221946 7f8c010263c1793619b9db26684b3d13 ""
   (generated)
   "cs190-ieee.aux"
   "cs190-ieee.log"
